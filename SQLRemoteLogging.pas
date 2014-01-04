@@ -39,6 +39,8 @@ type
     procedure DeleteInput(DeleteStr : String;
                           TypeStr : String);
 
+
+
   published
     constructor Create;
 
@@ -57,6 +59,8 @@ type
     procedure DeleteValue(Value : String);
 
     procedure DeleteColumnValuePair(Index : Integer);
+
+    function CurrentDatetime : String;
 
 
 
@@ -222,8 +226,8 @@ procedure TRemoteLog.DeleteValue(Value : String);
 begin
   DeleteInput(Value, 'V');
 end;
-{==============================================================================}
 
+{==============================================================================}
 procedure TRemoteLog.DeleteInput(DeleteStr : String;
                                  TypeStr: String);
 var
@@ -246,6 +250,18 @@ begin
         if (I<>-1)
           then slValuesList.Delete(I);
       end;
+end;
+
+{==============================================================================}
+function TRemoteLog.CurrentDatetime: String;
+var
+  dtCurTime : TDateTime;
+  sTimeStr, sDateStr : String;
+begin
+  dtCurTime := Now;
+  sDateStr := FormatDateTime('yyyymmdd',dtCurTime);
+  sTimeStr := FormatDateTime('hh:mm:ss.zzz',dtCurTime);
+  Result := sDateStr + ' ' + sTimeStr;
 end;
 
 end.

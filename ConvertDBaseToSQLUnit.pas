@@ -53,8 +53,8 @@ type
     dlgLoadIniFile: TOpenDialog;
     btnLocateServerFolder: TxpButton;
     cbUseRemoteLogging: TxpCheckBox;
-    ADORemoteLogConnection: TADOConnection;
-    ADORemoteLogQuery: TADOQuery;
+    edClientId: TxpEdit;
+    Label7: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure btnRunClick(Sender: TObject);
     procedure cbxDBaseDatabaseCloseUp(Sender: TObject);
@@ -117,7 +117,7 @@ var
   GlblCurrentCommaDelimitedField : Integer;
   fmConvertDBaseToSQL: TfmConvertDBaseToSQL;
   sStartLogString, sFinishLogString : String;
-  rlRemoteLog : TRemoteLog;
+  rlRemoteLog, rlEndRemoteLog : TRemoteLog;
 
 const
   sSeparator = '|';
@@ -227,6 +227,8 @@ begin
   {Remote Logging}
   rlRemoteLog := TRemoteLog.Create;
   rlRemoteLog.SetTable('log_entry');
+  rlRemoteLog.AddColumn('log_datetime');
+  rlRemoteLog.AddValue(rlRemoteLog.CurrentDatetime);
 
   GlblCurrentCommaDelimitedField := 0;
   Session.GetDatabaseNames(cbxDBaseDatabase.Items);
@@ -387,7 +389,7 @@ begin
   UpdateStatus('Dropping Table ' + sTableName);
 
   _QueryExec(adoQuery,
-             ['Drop Table ' + sTableName]);
+             ['Drop Table [' + sSQLDatabaseName + '].[dbo].[' + sTableName + ']']);
 
   UpdateStatus('Creating Table ' + sTableName);
 
@@ -543,6 +545,9 @@ begin
   rlRemoteLog.AddColumn('log_entry');
   sTempStr := StringListToCommaDelimitedString(SaveSelectedListBoxItems(lbxTables));
   rlRemoteLog.AddValue(sTempStr);
+  rlRemoteLog.AddColumn('log_instance_id');
+  rlRemoteLog.AddValue(edClientId.Text);
+
 
   if cbUseRemoteLogging.Checked
     then rlRemoteLog.SaveLog;
@@ -622,6 +627,10 @@ begin
   UpdateStatus('Done.');
   ProgressBar.Position := 0;
 
+  {End of run logging}
+  rlEndRemoteLog := TRemoteLog.Create;
+
+
   slSelectedTables.Free;
   tbExtract.Close;
   tbExtract.Free;
@@ -670,6 +679,19 @@ begin
   SaveIniFile(Self, sDefaultIniFileName, True, False);
   sFinishLogString := FormatDateTime(DateFormat, Date) + #9 + FormatDateTime(TimeFormat, Now) + #9 + 'CLOSE' + #9 + 'FINISHED' ;
   hLog.AddStr(sFinishLogString);
+
+  rlEndRemoteLog := TRemoteLog.Create;
+  rlEndRemoteLog.SetTable('log_entry');
+  rlEndRemoteLog.AddColumn('log_action');
+  rlEndRemoteLog.AddValue('FINISH');
+  rlEndRemoteLog.AddColumn('run_type');
+  if bAutoRun
+    then rlEndRemoteLog.AddValue('AUTO')
+    else rlEndRemoteLog.AddValue('MANUAL');
+  rlEndRemoteLog.AddColumn('log_datetime');
+  rlEndRemoteLog.AddValue(rlRemoteLog.CurrentDatetime);
+  rlEndRemoteLog.SaveLog;
+  
 end; {Save current setup as default on close}
 
 {CHG12082103(MPT):Adding autorun functionaity}

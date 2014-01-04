@@ -114,6 +114,19 @@ object fmConvertDBaseToSQL: TfmConvertDBaseToSQL
       Font.Style = []
       ParentFont = False
     end
+    object Label7: TLabel
+      Left = 371
+      Top = 186
+      Width = 70
+      Height = 13
+      Caption = '---------Client ID:'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = []
+      ParentFont = False
+    end
     object cbxSQLDatabase: TxpComboBox
       Left = 99
       Top = 88
@@ -442,6 +455,21 @@ object fmConvertDBaseToSQL: TfmConvertDBaseToSQL
       Checked = True
       Alignment = cbaLeft
     end
+    object edClientId: TxpEdit
+      Left = 456
+      Top = 183
+      Width = 89
+      Height = 21
+      Alignment = taLeftJustify
+      Rounded = True
+      RoundRadius = 4
+      ActiveFrameColor = clNavy
+      InActiveFrameColor = clBtnShadow
+      MarginLeft = 2
+      MarginRight = 2
+      Style = esFlat
+      TabOrder = 13
+    end
   end
   object Panel1: TPanel
     Left = 0
@@ -717,15 +745,5 @@ object fmConvertDBaseToSQL: TfmConvertDBaseToSQL
     InitialDir = 'C:\SCA\ConvertDBaseToSQL'
     Left = 336
     Top = 411
-  end
-  object ADORemoteLogConnection: TADOConnection
-    LoginPrompt = False
-    Left = 552
-    Top = 190
-  end
-  object ADORemoteLogQuery: TADOQuery
-    Parameters = <>
-    Left = 680
-    Top = 174
   end
 end
