@@ -115,16 +115,18 @@ object fmConvertDBaseToSQL: TfmConvertDBaseToSQL
       ParentFont = False
     end
     object Label7: TLabel
-      Left = 371
+      Left = 411
       Top = 186
-      Width = 70
+      Width = 54
       Height = 13
-      Caption = '---------Client ID:'
+      Caption = 'Client ID:'
+      Color = clBtnHighlight
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clBlack
       Font.Height = -11
       Font.Name = 'MS Sans Serif'
-      Font.Style = []
+      Font.Style = [fsBold]
+      ParentColor = False
       ParentFont = False
     end
     object cbxSQLDatabase: TxpComboBox
@@ -456,9 +458,9 @@ object fmConvertDBaseToSQL: TfmConvertDBaseToSQL
       Alignment = cbaLeft
     end
     object edClientId: TxpEdit
-      Left = 456
+      Left = 464
       Top = 183
-      Width = 89
+      Width = 81
       Height = 21
       Alignment = taLeftJustify
       Rounded = True

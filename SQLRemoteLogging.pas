@@ -50,6 +50,9 @@ type
 
     procedure AddValue(Value : String); Overload;
 
+    procedure AddColumnValuePair(ColumnName : String;
+                                 Value : String); 
+
     procedure SaveLog;
 
     procedure SetConnectionString(ConnectionString : String);
@@ -85,6 +88,16 @@ type
       write slValuesList;
 
   end;
+
+  Const
+    rlTables = 'log_entry';
+    rlDatetime = 'log_datetime';
+    rlRunType = 'run_type';
+    rlSource = 'source';
+    rlDestination = 'destination';
+    rlClientId = 'log_instance_id';
+    rlAction = 'log_action';
+    rlConfiguration = 'configuration';
 
 implementation
 
@@ -262,6 +275,14 @@ begin
   sDateStr := FormatDateTime('yyyymmdd',dtCurTime);
   sTimeStr := FormatDateTime('hh:mm:ss.zzz',dtCurTime);
   Result := sDateStr + ' ' + sTimeStr;
+end;
+
+{==============================================================================}
+procedure TRemoteLog.AddColumnValuePair(ColumnName: String;
+                                        Value: String);
+begin
+  AddColumn(ColumnName);
+  AddValue(Value);
 end;
 
 end.

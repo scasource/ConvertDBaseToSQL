@@ -227,8 +227,7 @@ begin
   {Remote Logging}
   rlRemoteLog := TRemoteLog.Create;
   rlRemoteLog.SetTable('log_entry');
-  rlRemoteLog.AddColumn('log_datetime');
-  rlRemoteLog.AddValue(rlRemoteLog.CurrentDatetime);
+
 
   GlblCurrentCommaDelimitedField := 0;
   Session.GetDatabaseNames(cbxDBaseDatabase.Items);
@@ -532,25 +531,22 @@ begin
   hLog.Add(sStartLogString);
 
   {Remote Logging}
-  rlRemoteLog.AddColumn('log_action');
-  rlRemoteLog.AddValue('START');
-  rlRemoteLog.AddColumn('run_type');
-  if bAutoRun
-    then rlRemoteLog.AddValue('AUTO')
-    else rlRemoteLog.AddValue('MANUAL');
-  rlRemoteLog.AddColumn('source');
-  rlRemoteLog.AddValue(cbxDBaseDatabase.Text);
-  rlRemoteLog.AddColumn('destination');
-  rlRemoteLog.AddValue(edExtractFolder.Text);
-  rlRemoteLog.AddColumn('log_entry');
-  sTempStr := StringListToCommaDelimitedString(SaveSelectedListBoxItems(lbxTables));
-  rlRemoteLog.AddValue(sTempStr);
-  rlRemoteLog.AddColumn('log_instance_id');
-  rlRemoteLog.AddValue(edClientId.Text);
-
-
   if cbUseRemoteLogging.Checked
-    then rlRemoteLog.SaveLog;
+    then
+      begin
+        rlRemoteLog.AddColumnValuePair(rlDateTime, rlRemoteLog.CurrentDatetime);
+        rlRemoteLog.AddColumnValuePair(rlAction, 'START');
+        rlRemoteLog.AddColumn(rlRunType);
+        if bAutoRun
+          then rlRemoteLog.AddValue('AUTO')
+          else rlRemoteLog.AddValue('MANUAL');
+        rlRemoteLog.AddColumnValuePair(rlSource, cbxDBaseDatabase.Text);
+        rlRemoteLog.AddColumnValuePair(rlDestination, edExtractFolder.Text);
+        sTempStr := StringListToCommaDelimitedString(SaveSelectedListBoxItems(lbxTables));
+        rlRemoteLog.AddColumnValuePair(rlTables, sTempStr);
+        rlRemoteLog.AddColumnValuePair(rlClientId, edClientId.Text);
+        rlRemoteLog.SaveLog;
+      end;
 
   bCancelled := False;
   slSelectedTables := TStringList.Create;
@@ -628,7 +624,23 @@ begin
   ProgressBar.Position := 0;
 
   {End of run logging}
-  rlEndRemoteLog := TRemoteLog.Create;
+  {Local}
+  sFinishLogString := FormatDateTime(DateFormat, Date) + #9 + FormatDateTime(TimeFormat, Now) + #9 + 'CLOSE' + #9 + 'FINISHED' ;
+  hLog.AddStr(sFinishLogString);
+  {Remote}
+  if cbxUseRemoteLogging.checked
+    then
+      begin
+        rlEndRemoteLog := TRemoteLog.Create;
+        rlEndRemoteLog.SetTable('log_entry');
+        rlEndRemoteLog.AddColumnValuePair(rlAction, 'FINISH');
+        rlEndRemoteLog.AddColumn(rlRunType);
+        if bAutoRun
+          then rlEndRemoteLog.AddValue('AUTO')
+          else rlEndRemoteLog.AddValue('MANUAL');
+        rlEndRemoteLog.AddColumnValuePair(rlDatetime, rlEndRemoteLog.CurrentDatetime);
+        rlEndRemoteLog.SaveLog;
+      end;
 
 
   slSelectedTables.Free;
@@ -677,21 +689,7 @@ procedure TfmConvertDBaseToSQL.FormClose(Sender: TObject;
 
 begin
   SaveIniFile(Self, sDefaultIniFileName, True, False);
-  sFinishLogString := FormatDateTime(DateFormat, Date) + #9 + FormatDateTime(TimeFormat, Now) + #9 + 'CLOSE' + #9 + 'FINISHED' ;
-  hLog.AddStr(sFinishLogString);
 
-  rlEndRemoteLog := TRemoteLog.Create;
-  rlEndRemoteLog.SetTable('log_entry');
-  rlEndRemoteLog.AddColumn('log_action');
-  rlEndRemoteLog.AddValue('FINISH');
-  rlEndRemoteLog.AddColumn('run_type');
-  if bAutoRun
-    then rlEndRemoteLog.AddValue('AUTO')
-    else rlEndRemoteLog.AddValue('MANUAL');
-  rlEndRemoteLog.AddColumn('log_datetime');
-  rlEndRemoteLog.AddValue(rlRemoteLog.CurrentDatetime);
-  rlEndRemoteLog.SaveLog;
-  
 end; {Save current setup as default on close}
 
 {CHG12082103(MPT):Adding autorun functionaity}
