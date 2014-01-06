@@ -35,9 +35,7 @@ type
     Panel6: TPanel;
     btnLoad: TSpeedButton;
     btnSave: TSpeedButton;
-    btnTest: TSpeedButton;
     btnRun: TSpeedButton;
-    btnCancel: TSpeedButton;
     Label4: TLabel;
     edUDLFileName: TxpEdit;
     btnLocateUDL: TxpButton;
@@ -55,6 +53,7 @@ type
     cbUseRemoteLogging: TxpCheckBox;
     edClientId: TxpEdit;
     Label7: TLabel;
+    cbAutoInc: TxpCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure btnRunClick(Sender: TObject);
     procedure cbxDBaseDatabaseCloseUp(Sender: TObject);
@@ -71,7 +70,7 @@ type
 
     bAutoRun, bCreateTables, bCombineToNY,
     bUseSQLLogin, bDeleteExtracts, bCancelled,
-    bLoadDefaultsOnStartUp : Boolean;
+    bLoadDefaultsOnStartUp, bAutoInc : Boolean;
     sDefaultSet, sDBaseDatabaseName, sUDLFileName,
     sSQLPassword, sSQLUser, sServerName, sSQLDatabaseName,
     sLogFileLocation, sNotificationSettings : String;
@@ -512,11 +511,12 @@ Procedure TfmConvertDBaseToSQL.btnRunClick(Sender: TObject);
 var
   slSelectedTables, slSaveTables : TStringList;
   I, iMemoNumber : Integer;
-  sConnectionString,
+  sConnectionString, sAutoInc,
   sExtractName, sExtractFolder, sServerFolder,
   sTempStr : String;
-  adoQuery : TADOQuery;
+  adoQuery, adoAutoInc : TADOQuery;
   tbExtract : TTable;
+  adoConnectAutoInc : TADOConnection;
 
 begin
   {CHG12202013(MPT):Implementation of both client and server side logging}
@@ -620,6 +620,30 @@ begin
 
   end;  {while ((not bCancelled) and...}
 
+  {CHG010520114(MPT):Allow Sales_ID in PSalesRec to autoincrement if checked}
+  bAutoInc := cbAutoInc.Checked;
+  sAutoInc := 'ALTER TABLE PSalesRec DROP COLUMN Sale_ID;';
+  if bAutoInc
+    then
+      begin
+          adoAutoInc := TADOQuery.Create(nil);
+          adoConnectAutoInc := TADOConnection.Create(nil);
+          adoConnectAutoInc.ConnectionString := 'FILE NAME=' + edUDLFileName.Text;
+          adoConnectAutoInc.LoginPrompt := False;
+          adoConnectAutoInc.Connected := True;
+
+          adoAutoInc.Connection := adoConnectAutoInc;
+          adoAutoInc.SQL.Add(sAutoInc);
+          adoAutoInc.ExecSQL;
+          adoAutoInc.Free;
+
+          adoAutoInc := TADOQuery.Create(nil);
+          adoAutoInc.Connection := adoConnectAutoInc;
+          adoAutoInc.SQL.Add('ALTER TABLE PSalesRec ADD Sale_ID int IDENTITY(1,1);');
+          adoAutoInc.ExecSQL;
+          adoAutoInc.Free;
+      end;
+
   UpdateStatus('Done.');
   ProgressBar.Position := 0;
 
@@ -628,7 +652,7 @@ begin
   sFinishLogString := FormatDateTime(DateFormat, Date) + #9 + FormatDateTime(TimeFormat, Now) + #9 + 'CLOSE' + #9 + 'FINISHED' ;
   hLog.AddStr(sFinishLogString);
   {Remote}
-  if cbxUseRemoteLogging.checked
+  if cbUseRemoteLogging.checked
     then
       begin
         rlEndRemoteLog := TRemoteLog.Create;
