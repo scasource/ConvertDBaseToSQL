@@ -1,20 +1,29 @@
 [Closed Files]
-File_0=SourceModule,'C:\SCA\ConvertDBaseToSQL\Utilities.pas',0,1,1,31,1204,0,0
-File_1=SourceModule,'C:\SCA\ConvertDBaseToSQL\HotLog.pas',0,1,520,1,546,0,0
-File_2=SourceModule,'C:\SCA\ConvertDBaseToSQL\RemoteLogging.pas',0,1,1,35,2,0,0
-File_3=SourceModule,'C:\SCA\ConvertDBaseToSQL\Definitions.pas',0,1,1,1,33,0,0
-File_4=SourceModule,'C:\SCA\ConvertDBaseToSQL\ConvertDBaseToSQLUnit.dfm',0,1,1,1,1,0,0
-File_5=SourceModule,'C:\SCA\ConvertDBaseToSQL\CreateLogFile.pas',0,1,141,106,154,0,0
-File_6=SourceModule,'c:\program files (x86)\borland\delphi7\source\vcl\adodb.pas',0,1,6142,1,6158,0,0
+File_0=SourceModule,'c:\program files (x86)\borland\delphi7\Source\Indy\IdTCPConnection.pas',0,1,606,132,582,0,0
+File_1=SourceModule,'C:\SCA\AmazonEmailTest\AmazonEmailTestUnit.dfm',0,1,1,1,1,0,0
+File_2=SourceModule,'c:\program files (x86)\borland\delphi7\source\rtl\Sys\sysutils.pas',0,1,14305,1,14319,0,0
+File_3=SourceModule,'C:\SCA\Backups\ConvertDBaseToSQL\Utilities.pas',0,1,1206,1,1220,0,0
+File_4=SourceModule,'C:\SCA\Backups\ConvertDBaseToSQL\ConvertDBaseToSQLUnit.pas',0,1,493,13,506,0,0
+File_5=SourceModule,'C:\SCA\Test Suite\SQLRemoteLoggingBeta.pas',0,1,16,6,18,0,0
+File_6=SourceModule,'C:\SCA\ConvertDBaseToSQL\HotLog.pas',0,1,520,1,546,0,0
+File_7=SourceModule,'C:\SCA\ConvertDBaseToSQL\RemoteLogging.pas',0,1,1,35,2,0,0
+File_8=SourceModule,'C:\SCA\ConvertDBaseToSQL\Definitions.pas',0,1,1,1,33,0,0
 
 [Modules]
-Module0=C:\SCA\Test Suite\SQLRemoteLoggingBeta.pas
-Module1=C:\SCA\ConvertDBaseToSQL\SQLRemoteLogging.pas
-Module2=C:\SCA\ConvertDBaseToSQL\ConvertDBaseToSQLUnit.pas
-Count=3
+Module0=C:\SCA\ConvertDBaseToSQL\ConvertDBaseToSQLUnit.pas
+Module1=C:\SCA\AmazonEmailTest\AmazonEmailTestUnit.pas
+Module2=C:\SCA\ConvertDBaseToSQL\SQLRemoteLogging.pas
+Module3=C:\SCA\ConvertDBaseToSQL\Utilities.pas
+Module4=c:\program files (x86)\borland\delphi7\Source\Indy\IdIOHandler.pas
+Count=5
 EditWindowCount=1
 
-[C:\SCA\Test Suite\SQLRemoteLoggingBeta.pas]
+[C:\SCA\ConvertDBaseToSQL\ConvertDBaseToSQLUnit.pas]
+ModuleType=SourceModule
+FormState=1
+FormOnTop=0
+
+[C:\SCA\AmazonEmailTest\AmazonEmailTestUnit.pas]
 ModuleType=SourceModule
 FormState=0
 FormOnTop=0
@@ -24,9 +33,14 @@ ModuleType=SourceModule
 FormState=0
 FormOnTop=0
 
-[C:\SCA\ConvertDBaseToSQL\ConvertDBaseToSQLUnit.pas]
+[C:\SCA\ConvertDBaseToSQL\Utilities.pas]
 ModuleType=SourceModule
-FormState=1
+FormState=0
+FormOnTop=0
+
+[c:\program files (x86)\borland\delphi7\Source\Indy\IdIOHandler.pas]
+ModuleType=SourceModule
+FormState=0
 FormOnTop=0
 
 [C:\Program Files (x86)\Borland\Delphi7\Projects\ProjectGroup1.bpg]
@@ -36,26 +50,30 @@ FormOnTop=0
 [C:\SCA\ConvertDBaseToSQL\ConvertDBaseToSQL.dpr]
 FormState=0
 FormOnTop=0
+SymbolFile=C:\SCA\ConvertDBaseToSQL\ConvertDBaseToSQL.dsm
+ModSinceCompile=0
 
 [EditWindow0]
-ViewCount=3
-CurrentView=1
+ViewCount=5
+CurrentView=0
 View0=0
 View1=1
 View2=2
+View3=3
+View4=4
 CodeExplorer=CodeExplorer@EditWindow0
 MessageView=MessageView@EditWindow0
 Create=1
 Visible=1
 State=0
-Left=296
-Top=190
+Left=340
+Top=158
 Width=1302
-Height=682
+Height=796
 MaxLeft=-1
 MaxTop=-1
 ClientWidth=1286
-ClientHeight=644
+ClientHeight=758
 LeftPanelSize=140
 LeftPanelClients=CodeExplorer@EditWindow0
 LeftPanelData=000004000000000000000000000000000000000000000000000100000000000000000C000000436F64654578706C6F726572FFFFFFFF
@@ -66,23 +84,37 @@ BottomPanelData=0000040000000000000000000000000000000000000000000001000000000000
 
 [View0]
 Module=C:\SCA\ConvertDBaseToSQL\ConvertDBaseToSQLUnit.pas
-CursorX=86
-CursorY=8
-TopLine=1
+CursorX=1
+CursorY=838
+TopLine=821
 LeftCol=1
 
 [View1]
-Module=C:\SCA\Test Suite\SQLRemoteLoggingBeta.pas
-CursorX=6
-CursorY=18
-TopLine=16
+Module=c:\program files (x86)\borland\delphi7\Source\Indy\IdIOHandler.pas
+CursorX=121
+CursorY=12
+TopLine=1
 LeftCol=1
 
 [View2]
+Module=C:\SCA\ConvertDBaseToSQL\Utilities.pas
+CursorX=52
+CursorY=2094
+TopLine=2063
+LeftCol=1
+
+[View3]
 Module=C:\SCA\ConvertDBaseToSQL\SQLRemoteLogging.pas
-CursorX=27
-CursorY=100
-TopLine=100
+CursorX=4
+CursorY=84
+TopLine=1
+LeftCol=1
+
+[View4]
+Module=C:\SCA\AmazonEmailTest\AmazonEmailTestUnit.pas
+CursorX=16
+CursorY=52
+TopLine=25
 LeftCol=1
 
 [Watches]
@@ -206,8 +238,8 @@ LRDockWidth=190
 Dockable=1
 SplitPos=127
 ArrangeBy=Name
-SelectedItem=Caption
-ExpandedItems=Font.Style,Options,OptionsEx,XPStyle
+SelectedItem=Name
+ExpandedItems=Font,Font.Style,Options,OptionsEx,XPStyle
 HiddenCategories=Legacy
 
 [BreakpointWindow]
@@ -236,8 +268,8 @@ Column5Width=75
 Create=1
 Visible=1
 State=0
-Left=1131
-Top=135
+Left=1601
+Top=320
 Width=294
 Height=161
 MaxLeft=-1
@@ -399,11 +431,11 @@ State=0
 Left=0
 Top=12
 Width=140
-Height=544
+Height=658
 MaxLeft=-1
 MaxTop=-1
 ClientWidth=140
-ClientHeight=544
+ClientHeight=658
 TBDockHeight=305
 LRDockWidth=140
 Dockable=1

@@ -1,6 +1,6 @@
 object fmConvertDBaseToSQL: TfmConvertDBaseToSQL
-  Left = 843
-  Top = 121
+  Left = 596
+  Top = 109
   Width = 960
   Height = 931
   Caption = 'Convert DBase To SQL'
@@ -724,5 +724,24 @@ object fmConvertDBaseToSQL: TfmConvertDBaseToSQL
     InitialDir = 'C:\SCA\ConvertDBaseToSQL'
     Left = 336
     Top = 411
+  end
+  object IdSMTP: TIdSMTP
+    IOHandler = IdSSLIOHandlerSocketOpenSSL1
+    Port = 587
+    SASLMechanisms = <>
+    UseTLS = utUseExplicitTLS
+    Left = 70
+    Top = 474
+  end
+  object IdSSLIOHandlerSocketOpenSSL1: TIdSSLIOHandlerSocketOpenSSL
+    Destination = ':587'
+    MaxLineAction = maException
+    Port = 587
+    DefaultPort = 0
+    SSLOptions.Mode = sslmUnassigned
+    SSLOptions.VerifyMode = []
+    SSLOptions.VerifyDepth = 0
+    Left = 208
+    Top = 579
   end
 end

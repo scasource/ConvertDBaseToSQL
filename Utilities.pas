@@ -262,7 +262,7 @@ begin
       vtPChar      : Result := VPChar;
       vtObject     : Result := VObject.ClassName;
       vtClass      : Result := VClass.ClassName;
-      vtAnsiString : Result := string(VANSIString^);
+      vtAnsiString : Result := PChar(VANSIString);
       vtCurrency   : Result := CurrToStr(VCurrency^);
       vtVariant    : Result := string(VVariant^);
       vtInt64      : Result := IntToStr(VInt64^);
@@ -2068,7 +2068,6 @@ Function SaveSelectedListBoxItems(Component : TComponent) : TStringList;
 var
   slSelectedItems : TStringList;
   I : Integer;
-  sComponentValue : String;
 
 begin
   slSelectedItems := TStringList.Create;
@@ -2092,9 +2091,10 @@ begin
       begin
         sResultString := sResultString + StringList[I];
         If (I < StringList.Count-1)
-          then sResultString := sResultString + ',';
+          then sResultString := sResultString + ', ';
       end;
   Result := sResultString;
 end;
+
 
 end.

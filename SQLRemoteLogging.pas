@@ -1,5 +1,5 @@
 {==========================================================================
-This is unit is used to create an SQL insert statement for the purposes of
+This unit is used to create an SQL insert statement for the purposes of
 logging program behavior to a remote SQL server.
 
 TODO:
@@ -71,14 +71,6 @@ type
       read bUseColumns
       write bUseColumns;
 
-    property ConnectionString : String
-      read sConnectionString
-      write SetConnectionString;
-
-    property TableName : String
-      read sTableName
-      write SetTable;
-
     property ColumnList : TStringlist
       read slColumnList
       write slColumnList;
@@ -89,7 +81,7 @@ type
 
   end;
 
-  Const
+  const
     rlTables = 'log_entry';
     rlDatetime = 'log_datetime';
     rlRunType = 'run_type';
@@ -125,7 +117,7 @@ end;
 procedure TRemoteLog.SaveInput(InputStr : String;
                                TypeStr : String);
 var
-  sTypeStr, sTempStr : String;
+  sTypeStr : String;
 
 begin
   sTypeStr := AnsiUpperCase(TypeStr);

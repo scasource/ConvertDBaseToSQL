@@ -4,8 +4,12 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, Buttons, ComCtrls, StdCtrls, ExtCtrls, FileCtrl, xpEdit, xpCheckBox,
-  xpCombo, xpGroupBox, DBTables, DB, ADODB, xpButton, Menus, HotLog, SQLRemoteLogging;
+  Dialogs, Buttons, ComCtrls, StdCtrls, ExtCtrls, xpButton, xpEdit,
+  xpCheckBox, xpCombo, xpGroupBox, FileCtrl, 
+  DBTables, DB, ADODB, Menus, HotLog, SQLRemoteLogging, IdTCPConnection,
+  IdTCPClient, IdExplicitTLSClientServerBase, IdMessageClient, IdSMTPBase,
+  IdSMTP, IdBaseComponent, IdComponent, IdServerIOHandler, IdSSL,
+  IdSSLOpenSSL, IdIOHandler, IdIOHandlerSocket, IdIOHandlerStack, IdMessage;
 
 type
   TfmConvertDBaseToSQL = class(TForm)
@@ -54,6 +58,8 @@ type
     edClientId: TxpEdit;
     Label7: TLabel;
     cbAutoInc: TxpCheckBox;
+    IdSMTP: TIdSMTP;
+    IdSSLIOHandlerSocketOpenSSL1: TIdSSLIOHandlerSocketOpenSSL;
     procedure FormCreate(Sender: TObject);
     procedure btnRunClick(Sender: TObject);
     procedure cbxDBaseDatabaseCloseUp(Sender: TObject);
@@ -109,6 +115,8 @@ type
                            bDropSourceTable : Boolean);
 
     Procedure AutoRun;
+
+    Procedure SendNotification(NotificationLevel : Integer);
 
   end;
 
@@ -228,6 +236,8 @@ begin
   rlRemoteLog.SetTable('log_entry');
 
 
+
+
   GlblCurrentCommaDelimitedField := 0;
   Session.GetDatabaseNames(cbxDBaseDatabase.Items);
   bAutoRun := False;
@@ -259,12 +269,6 @@ begin
           hLog.hlWriter.hlFileDef.fileName := sLogFileLocation ;
         end;
 
-    if (Pos('NOTIFICATION',Uppercase(sParameterString)) > 0)
-      then
-        begin
-          sNotificationSettings := sParameterString;
-          Delete(sNotificationSettings,1,13);
-        end;
   end;
 
   rlRemoteLog.AddColumn('configuration');
@@ -274,6 +278,7 @@ begin
   if bLoadDefaultsOnStartUp
     then LoadParameters;
 
+  SendNotification(3);
   AutoRun;
 
 end;  {FormCreate}
@@ -319,6 +324,7 @@ begin
     For I := 0 to (FieldList.Count - 1) do
       slFields.Add(FieldList[I].FieldName);
   except
+    SendNotification(5);
   end;
 
   If (bCreateNewFile and
@@ -400,6 +406,7 @@ begin
     Open;
     First;
   except
+    SendNotification(5);
   end;
 
   with tbExtract do
@@ -429,6 +436,7 @@ begin
     adoQuery.SQL.Assign(slSQL);
     adoQuery.ExecSQL;
   except
+    SendNotification(5);
   end;
 
   tbExtract.Close;
@@ -569,6 +577,7 @@ begin
   bCreateTables := cbCreateTableStructure.Checked;
   bCombineToNY := cbCombineToNY.Checked;
 
+
   sUDLFileName := edUDLFileName.Text;
   If _Compare(sUDLFileName, coBlank)
   then sConnectionString := GetADOConnectionString(bUseSQLLogin, sSQLPassword, sSQLUser,
@@ -577,6 +586,7 @@ begin
 
   bCancelled := False;
   I := 0;
+
 
   tbExtract := TTable.Create(nil);
   adoQuery := TADOQuery.Create(nil);
@@ -595,11 +605,14 @@ begin
     If bCreateTables
     then CreateOneTable(adoQuery, tbExtract, sDBaseDatabaseName, slSelectedTables[I], sSQLDatabaseName, sExtractName);
 
+
     sExtractName := sServerFolder + slSelectedTables[I] + '.txt';
     LoadOneTable(adoQuery, slSelectedTables[I], sSQLDatabaseName, sExtractName);
 
+
     If bDeleteExtracts
     then DeleteOneExtract(sExtractName);
+
 
     I := I + 1;
 
@@ -632,16 +645,24 @@ begin
           adoConnectAutoInc.LoginPrompt := False;
           adoConnectAutoInc.Connected := True;
 
+        try
           adoAutoInc.Connection := adoConnectAutoInc;
           adoAutoInc.SQL.Add(sAutoInc);
           adoAutoInc.ExecSQL;
           adoAutoInc.Free;
+        except
+          SendNotification(5);
+        end;
 
+        try
           adoAutoInc := TADOQuery.Create(nil);
           adoAutoInc.Connection := adoConnectAutoInc;
           adoAutoInc.SQL.Add('ALTER TABLE PSalesRec ADD Sale_ID int IDENTITY(1,1);');
           adoAutoInc.ExecSQL;
           adoAutoInc.Free;
+        except
+          SendNotification(5);
+        end;
       end;
 
   UpdateStatus('Done.');
@@ -666,14 +687,22 @@ begin
         rlEndRemoteLog.SaveLog;
       end;
 
+  SendNotification(1);
 
   slSelectedTables.Free;
+  slSaveTables.Free;
   tbExtract.Close;
   tbExtract.Free;
   adoQuery.Close;
+  adoQuery.Free;
+  adoAutoInc.Close;
+  adoAutoInc.Free;
+  adoConnectAutoInc.Close;
+  adoConnectAutoInc.Free;
+
 
   if bAutoRun
-    then fmConvertDBaseToSQL.Destroy;
+    then fmConvertDBaseToSQL.Release;
 
 end;  {btnRunClick}
 
@@ -713,7 +742,7 @@ procedure TfmConvertDBaseToSQL.FormClose(Sender: TObject;
 
 begin
   SaveIniFile(Self, sDefaultIniFileName, True, False);
-
+  SendNotification(4);
 end; {Save current setup as default on close}
 
 {CHG12082103(MPT):Adding autorun functionaity}
@@ -724,5 +753,98 @@ begin
     then fmConvertDBaseToSQL.btnRunClick(Self);
 end;
 
+{CHG282014(MPT):Add support for notifications to be sent via e-mail.}
+{==========================================================}
+procedure TfmConvertDBaseToSQL.SendNotification(NotificationLevel : Integer);
+var
+  X, I : Integer;
+  sQuery, sNotification : String;
+  slEmail, slTableList : TStringList;
+  IdmEmail : TIdMessage;
+  adoCon : TADOConnection;
+  adoQuery : TADOQuery;
+
+begin
+  IdmEmail := TIdMessage.Create;
+  adoCon := TADOConnection.Create(nil);
+  adoQuery := TADOQuery.Create(nil);
+  slEmail := TStringList.Create;
+  slTableList := TStringList.Create;
+  slTableList := SaveSelectedListBoxItems(lbxTables);
+
+  with adoCon do
+    begin
+      ConnectionString := 'FILE NAME=' + GetCurrentDir + '\RemoteLog.udl';
+      ConnectionTimeout := 5000;
+      LoginPrompt := False;
+      Connected := True;
+    end; //Establish a connection to SCAWebDB.
+
+  for X:=NotificationLevel to 5 do
+    begin
+      sQuery := 'SELECT email FROM recipient WHERE alert_level = ' + IntToStr(X) + ' AND client_id = ' + edClientId.Text;
+
+      with adoQuery do
+        begin
+          SQL.Clear;
+          Connection := adoCon;
+          SQL.Add(sQuery);
+          Prepared := True;
+          Open;
+        end; //Get Email for all recipient with appropriate alert levels.
+
+      adoQuery.First;
+
+      for I:=1 to (adoQuery.RecordCount) do
+        begin
+          slEmail.Add(adoQuery.FieldByName('email').AsString);
+          Next;
+        end; //Move emails to stringlist.
+      adoQuery.Close;
+    end; //Gets all recipients where alert_level <= NotificationLevel.
+
+
+
+  case NotificationLevel of
+    1 : sNotification := 'The following tables have been successfully converted: ' + StringListToCommaDelimitedString(slTableList);
+    2 : sNotification := '';
+    3 : sNotification := 'ConvertDBaseToSQL has been opened.';
+    4 : sNotification := 'ConvertDBaseToSQL has been shutown.';
+    5 : sNotification := 'ConvertDBaseToSQL has crashed with the following error: ';
+    end; //Generate the body of the email based on the notification level.
+
+
+  for X:=0 to (slEmail.Count - 1) do
+    begin
+      with IdSMTP do
+        begin
+          Host := 'smtp.gmail.com';
+          Username := 'convertdbasetosql@gmail.com';
+          Password := 'SCAcdbtsql71';
+        end; //Connect to google SMTP server.
+
+      with IdmEmail do
+        begin
+          ContentType := 'text/plain';
+          From.Text := 'convertdbasetosql@gmail.com';
+          From.Address := 'convertdbasetosql@gmail.com';
+          From.Name := 'Automated Notification';
+          Recipients.Add.Address := slEmail[X];
+          Subject := 'AUTOMATIC NOTIFICATION';
+          Body.Text := sNotification;
+        end; //Assemble the E-mail.
+
+      try
+        IdSMTP.Send(IdmEmail);
+      except
+        on E: Exception do
+          ShowMessage('Error: ' + E.Message);
+      end; //Try to send the email.
+    end; //Generate and send notifcation emails.
+
+
+
+
+end;
 
 end.
