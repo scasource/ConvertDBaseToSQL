@@ -813,7 +813,7 @@ begin
     1 : sNotification := 'The following tables have been successfully converted: ' + StringListToCommaDelimitedString(slTableList);
     2 : sNotification := '';
     3 : sNotification := 'ConvertDBaseToSQL has been opened.';
-    4 : sNotification := 'ConvertDBaseToSQL has been shutdown.';
+    4 : sNotification := 'ConvertDBaseToSQL has been shutown.';
     5 : sNotification := 'ConvertDBaseToSQL has crashed with the following error: ';
     end; //Generate the body of the email based on the notification level.
 

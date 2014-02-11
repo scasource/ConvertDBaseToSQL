@@ -97,7 +97,7 @@ PackageDCPOutputDir=
 SearchPath=
 Packages=vclx;vcl;rtl;dsnapcon;dsnap;dbrtl;vcldb;VclSmp;adortl;bdertl;vcldbx;ibxpress;teeui;teedb;tee;dss;visualclx;visualdbclx;vclactnband;vclshlctrls;Rave50CLX;Rave50VCL;dclOffice2k;xmlrtl;IndySystem70;IndyProtocols70;B304vr70;Rave70VCL;B304_r70
 Conditionals=
-DebugSourceDirs=
+DebugSourceDirs=C:\SCA\Dephi Components\Delphi 7\Indy 10\Lib\Core\Source\
 UsePackages=0
 [Parameters]
 RunParams=
